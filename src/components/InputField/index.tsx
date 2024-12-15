@@ -1,9 +1,9 @@
-import React from "react";
-import { InputFieldProps } from "./@types/InputFieldProps";
+import React from 'react';
+import { InputFieldProps } from './@types/InputFieldProps';
 
 const InputField: React.FC<InputFieldProps> = ({
   label,
-  type = "text",
+  type = 'text',
   register,
   name,
   defaultValue,
@@ -12,7 +12,7 @@ const InputField: React.FC<InputFieldProps> = ({
   classStyles,
 }) => {
   return (
-    <div className={`flex flex-col gap-2 w-full md:w-1/4 ${classStyles}`}>
+    <div className={`flex flex-col gap-2 w-full ${classStyles}`}>
       <label className="text-xs text-gray-500">{label}</label>
       <input
         type={type}
@@ -21,9 +21,7 @@ const InputField: React.FC<InputFieldProps> = ({
         {...inputProps}
         defaultValue={defaultValue}
       />
-      {error?.message && (
-        <p className="text-xs text-red-400">{error.message.toString()}</p>
-      )}
+      {error?.message && <p className="text-xs text-red-400">{error.message.toString()}</p>}
     </div>
   );
 };

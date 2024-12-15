@@ -62,10 +62,10 @@ const AssetForm: React.FC<FormProps & { relatedData?: any }> = ({
   };
 
   return (
-    <form className="flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-xl font-semibold">{type === 'create' ? 'Thêm tài sản' : 'Chỉnh tài sản'}</h1>
-      <span className="text-xs text-gray-400 font-medium">Thông Tin Tài sản</span>
       <div className="flex gap-4 flex-col">
+        <label className="text-xs text-gray-500">Loại tài sản</label>
         <select className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" {...register('assetType')}>
           <option value="-1" key="-1">
             Chọn loại tài sản

@@ -1,25 +1,28 @@
-const Table: React.FC<TableProps> = ({
-  data,
-  columns,
-  renderRow,
-  isLoading,
-}) => {
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@nextui-org/react';
+
+const TableWrapper: React.FC<TableProps> = ({ data, columns, renderRow, isLoading }) => {
   return isLoading ? (
     <div>Loading...</div>
   ) : (
-    <table className="w-full mt-4">
-      <thead>
-        <tr className="text-left text-gray-500 text-sm ">
-          {columns.map((col) => (
-            <th key={col.accessor} className={col.className}>
-              {col.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>{data.map((item) => renderRow(item))}</tbody>
-    </table>
+    <div className=" w-full flex flex-col gap-4">
+      <Table removeWrapper isStriped aria-label="Table">
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column?.accessor}
+              align={column?.accessor === 'actions' ? 'center' : 'start'}
+              className="uppercase"
+            >
+              {column.header}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={data}>
+          {(item) => <TableRow>{(columnKey) => <TableCell>{renderRow({ item, columnKey })}</TableCell>}</TableRow>}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
 
-export default Table;
+export default TableWrapper;

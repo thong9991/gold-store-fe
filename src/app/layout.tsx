@@ -1,11 +1,11 @@
-"use client";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { Inter } from "next/font/google";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "./globals.css";
+import { Inter } from 'next/font/google';
+import { ToastContainer } from 'react-toastify';
 
-const inter = Inter({ subsets: ["latin"] });
+import { Providers } from './providers';
+import 'react-toastify/dist/ReactToastify.css';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
   children,
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ToastContainer
           position="bottom-right"
@@ -27,7 +27,7 @@ export default function RootLayout({
           pauseOnHover
           theme="dark"
         />
-        <AuthProvider>{children}</AuthProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import { staffSchema, StaffSchema } from "@/lib/formValidationSchemas";
-import { createStaff, updateStaff } from "@/services/staffs";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import InputField from "../InputField";
-import { FormProps } from "./@types/FormProps";
-import { citiesData } from "@/lib/cities";
-import { districtsData } from "@/lib/districts";
-import { wardsData } from "@/lib/wards";
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { staffSchema, StaffSchema } from '@/lib/formValidationSchemas';
+import { createStaff, updateStaff } from '@/services/staffs';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import InputField from '../InputField';
+import { FormProps } from './@types/FormProps';
+import { citiesData } from '@/lib/cities';
+import { districtsData } from '@/lib/districts';
+import { wardsData } from '@/lib/wards';
 
 const StaffForm: React.FC<FormProps> = ({
   type,
@@ -29,9 +29,9 @@ const StaffForm: React.FC<FormProps> = ({
   } = useForm<StaffSchema>({
     resolver: zodResolver(staffSchema),
     defaultValues: {
-      city: "-1",
-      district: "-1",
-      ward: "-1",
+      city: '-1',
+      district: '-1',
+      ward: '-1',
     },
   });
 
@@ -40,10 +40,10 @@ const StaffForm: React.FC<FormProps> = ({
 
   const [cities] = useState<{ id: string; name: string }[]>(citiesData);
   const [districts, setDistricts] = useState<{ id: string; name: string }[]>(
-    data && data.city != "-1" ? districtsData[data.city] : [],
+    data && data.city != '-1' ? districtsData[data.city] : []
   );
   const [wards, setWards] = useState<{ id: string; name: string }[]>(
-    data && data.district != "-1" ? wardsData[data.district] : [],
+    data && data.district != '-1' ? wardsData[data.district] : []
   );
 
   const [loading, setLoading] = useState(false);
@@ -55,33 +55,25 @@ const StaffForm: React.FC<FormProps> = ({
       const cityName = cities.find((e) => e.id == data.city)?.name;
       const districtName = districts.find((e) => e.id == data.district)?.name;
       const ward = wards.find((e) => e.id == data.ward);
-      const address = [
-        data.homeNumber,
-        ward ? ward.name : " ",
-        districtName,
-        cityName,
-      ].join(",");
+      const address = [data.homeNumber, ward ? ward.name : ' ', districtName, cityName].join(',');
 
-      if (type === "create") {
+      if (type === 'create') {
         await createStaff({ ...data, address: address });
       } else {
         await updateStaff(data.id!, { ...data, address: address });
       }
 
-      setMessage(
-        type === "create"
-          ? "Thêm thành công"
-          : "Chỉnh sữa thông tin thành công",
-      );
+      setMessage(type === 'create' ? 'Thêm thành công' : 'Chỉnh sửa thông tin thành công');
       setShowMessage(true);
       setMessageType(SnackbarMessageType.Success);
       setIsRefresh(true);
+      setOpen(false);
     } catch (error) {
       setMessageType(SnackbarMessageType.Error);
       if (error instanceof Error) {
         setMessage(`Error: ${error.message}`);
       } else {
-        setMessage("An unknown error occurred while registering the user.");
+        setMessage('An unknown error occurred while registering the user.');
       }
       setShowMessage(true);
     } finally {
@@ -91,28 +83,24 @@ const StaffForm: React.FC<FormProps> = ({
 
   useEffect(() => {
     if (data) {
-      setValue("city", data.city ?? "-1");
-      setValue("district", data.district ?? "-1");
-      setValue("ward", data.ward ?? "-1");
-      setValue("homeNumber", data.homeNumber ?? "");
+      setValue('city', data.city ?? '-1');
+      setValue('district', data.district ?? '-1');
+      setValue('ward', data.ward ?? '-1');
+      setValue('homeNumber', data.homeNumber ?? '');
     }
   }, [setValue]);
 
   return (
-    <form className="flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
-      <h1 className="text-xl font-semibold">
-        {type === "create" ? "Thêm giá vàng" : "Chỉnh sữa giá vàng"}
-      </h1>
-      <span className="text-xs text-gray-400 font-medium">
-        Thông Tin Nhân Viên
-      </span>
-      <div className="flex justify-between flex-wrap gap-4">
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <h1 className="text-xl font-semibold">{type === 'create' ? 'Thêm nhân viên' : 'Chỉnh sửa nhân viên'}</h1>
+      <div className="flex justify-between gap-4">
         <InputField
           label="Họ"
           name="firstName"
           defaultValue={data?.firstName}
           register={register}
           error={errors?.firstName}
+          classStyles="md:w-1/2"
         />
         <InputField
           label="Tên"
@@ -120,35 +108,34 @@ const StaffForm: React.FC<FormProps> = ({
           defaultValue={data?.lastName}
           register={register}
           error={errors?.lastName}
+          classStyles="md:w-1/2"
         />
+      </div>
+      <div className="flex justify-between flex-wrap gap-4">
         <InputField
-          label="Số Điện Thoài"
+          label="Số Điện Thoại"
           name="phone"
           defaultValue={data?.phone}
           register={register}
           error={errors?.phone}
         />
         <>
-          <input
-            {...register("id")}
-            className="hidden"
-            defaultValue={data?.id}
-          />
+          <input {...register('id')} className="hidden" defaultValue={data?.id} />
         </>
       </div>
       <span className="text-xs text-gray-400 font-medium">Địa Chỉ</span>
-      <div className="flex justify-between flex-wrap gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
+      <div className="flex justify-between gap-4">
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
           <label className="text-xs text-gray-500">Tỉnh, thành phố</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("city")}
+            {...register('city')}
             onChange={(e) => {
               const selectedCity = e.target.value;
               setDistricts(districtsOptions[selectedCity] || []);
               setWards([]);
-              setValue("district", "-1");
-              setValue("ward", "-1");
+              setValue('district', '-1');
+              setValue('ward', '-1');
             }}
           >
             <option value="-1" key="-1">
@@ -160,22 +147,18 @@ const StaffForm: React.FC<FormProps> = ({
               </option>
             ))}
           </select>
-          {errors.city?.message && (
-            <p className="text-xs text-red-400">
-              {errors.city.message.toString()}
-            </p>
-          )}
+          {errors.city?.message && <p className="text-xs text-red-400">{errors.city.message.toString()}</p>}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
           <label className="text-xs text-gray-500">Quận, huyện</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("district")}
+            {...register('district')}
             onChange={(e) => {
               const selectedDistrict = e.target.value;
               setWards(wardsOptions[selectedDistrict] || []);
-              setValue("ward", "-1");
+              setValue('ward', '-1');
             }}
           >
             <option value="-1" key="-1">
@@ -187,19 +170,12 @@ const StaffForm: React.FC<FormProps> = ({
               </option>
             ))}
           </select>
-          {errors.district?.message && (
-            <p className="text-xs text-red-400">
-              {errors.district.message.toString()}
-            </p>
-          )}
+          {errors.district?.message && <p className="text-xs text-red-400">{errors.district.message.toString()}</p>}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
           <label className="text-xs text-gray-500">Xã, thị trấn</label>
-          <select
-            className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("ward")}
-          >
+          <select className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full" {...register('ward')}>
             <option value="-1" key="-1">
               Chọn xã, thị trấn
             </option>
@@ -209,25 +185,18 @@ const StaffForm: React.FC<FormProps> = ({
               </option>
             ))}
           </select>
-          {errors.ward?.message && (
-            <p className="text-xs text-red-400">
-              {errors.ward.message.toString()}
-            </p>
-          )}
+          {errors.ward?.message && <p className="text-xs text-red-400">{errors.ward.message.toString()}</p>}
         </div>
-        <InputField
-          label="Số Nhà"
-          name="homeNumber"
-          defaultValue={data?.homeNumber}
-          register={register}
-          error={errors.homeNumber}
-        />
       </div>
-      <button
-        className="bg-blue-400 text-white p-2 rounded-md"
-        disabled={loading}
-      >
-        {type === "create" ? "Thêm" : "Xong"}
+      <InputField
+        label="Số Nhà"
+        name="homeNumber"
+        defaultValue={data?.homeNumber}
+        register={register}
+        error={errors.homeNumber}
+      />
+      <button className="bg-blue-400 text-white p-2 rounded-md" disabled={loading}>
+        {type === 'create' ? 'Thêm' : 'Xong'}
       </button>
     </form>
   );

@@ -152,7 +152,7 @@ export const assetSchema = z.object({
   assetType: z.string({
     required_error: 'Drawer name is a required field',
   }),
-  amount: z.coerce.number().min(100, { message: "Amount is required!" }),
+  amount: z.coerce.number().min(1, { message: "Amount is required!" }),
 });
 
 export type AssetSchema = z.infer<typeof assetSchema>;

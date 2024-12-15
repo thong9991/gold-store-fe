@@ -26,6 +26,7 @@ const Login: React.FC = () => {
     try {
       setLoading(true);
       const { token, refreshToken, user } = await signInRequest(data);
+      localStorage.setItem('userInfo', JSON.stringify(user));
       console.log(refreshToken);
       const expirationDate = new Date(refreshToken.expiresIn * 1000);
       console.log("expirationDate: " + expirationDate);

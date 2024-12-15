@@ -1,15 +1,20 @@
-"use client";
+'use client';
 
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Paginatiion";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { orderDetailColumns } from "./columns/orderDetailColumns";
-import { getAllOrders } from "@/services/orderDetails";
+import FormModal from '@/components/FormModal';
+import Table from '@/components/Table';
+import TableSearch from '@/components/TableSearch';
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { orderDetailColumns } from './columns/orderDetailColumns';
+import { getAllOrders } from '@/services/orderDetails';
+import { Input, Pagination } from '@nextui-org/react';
+import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
+import Link from 'next/link';
+import { CartIcon } from '@/components/icons/sidebar/cart-icon';
+import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
+import { InfoIcon } from '@/components/icons/accounts/info-icon';
 
 type OrderDetail = {
   id: number;
@@ -30,7 +35,7 @@ const AssetsListPage = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [messageType, setMessageType] = useState(SnackbarMessageType.Info);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -40,7 +45,7 @@ const AssetsListPage = () => {
         setOrders(response.body);
         setTotalPages(response.last_page);
       } catch (error) {
-        console.error("Error fetch assets:", error);
+        console.error('Error fetch assets:', error);
       } finally {
         setIsLoading(false);
       }
@@ -63,7 +68,7 @@ const AssetsListPage = () => {
           setTotalPages(response.last_page);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
         setIsRefresh(false);
@@ -80,81 +85,99 @@ const AssetsListPage = () => {
     }
   }, [showMessage, message, messageType]);
 
-  const renderRow = (item: OrderDetail) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-blue-200"
-    >
-      <td className="flex items-center gap-4 p-4">
-        {item?.id}
-      </td>
-      <td className="hidden md:table-cell">
-        {item?.total}.000 đ
-      </td>
-      <td className="hidden md:table-cell">
-        {item?.goldToCash}.000 đ
-      </td>
-      <td className="hidden md:table-cell">
-        {item?.discount}.000 đ
-      </td>
-      <td className="hidden md:table-cell">
-        {item?.description}
-      </td>
-      <td>
-        <div className="flex items-center gap-2">
-          <FormModal
-            table="order"
-            type="delete"
-            id={item.id}
-            setIsRefresh={setIsRefresh}
-            setShowMessage={setShowMessage}
-            setMessageType={setMessageType}
-            setMessage={setMessage}
-          />
-        </div>
-      </td>
-    </tr>
-  );
-  return (
-    <div className="bg-white rounded-md p-4 flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block font-semibold text-lg">Tài sản</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {/* <FormModal
+  const renderRow = ({ item, columnKey }: { item: OrderDetail; columnKey: string | React.Key }) => {
+    switch (columnKey) {
+      case 'id':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.id}</p>
+          </div>
+        );
+      case 'total':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.total},000</p>
+          </div>
+        );
+      case 'goldToCash':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.goldToCash},000</p>
+          </div>
+        );
+      case 'discount':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.discount},000</p>
+          </div>
+        );
+      case 'description':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.description}</p>
+          </div>
+        );
+      case 'action':
+        return (
+          <div className="flex items-center gap-4">
+            <FormModal
               table="order"
-              type="create"
+              type="delete"
+              id={item.id}
               setIsRefresh={setIsRefresh}
               setShowMessage={setShowMessage}
               setMessageType={setMessageType}
               setMessage={setMessage}
-            /> */}
+            />
           </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="my-10 px-4 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
+      {/* TOP */}
+      <ul className="flex">
+        <li className="flex gap-2">
+          <HouseIcon />
+          <Link href={'/admin'}>
+            <span>Trang chủ</span>
+          </Link>
+          <span> / </span>
+        </li>
+
+        <li className="flex gap-2">
+          <CartIcon />
+          <span>Chi tiết đặt hàng</span>
+          <span> / </span>
+        </li>
+        <li className="flex gap-2">
+          <span>&nbsp;Danh sách</span>
+        </li>
+      </ul>
+      <h3 className="text-xl font-semibold">Tất cả đơn đặt hàng</h3>
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+          <Input
+            classNames={{
+              input: 'w-full',
+              mainWrapper: 'w-full',
+            }}
+            placeholder="Tìm kiếm"
+          />
+          <SettingsIcon />
+          <InfoIcon />
         </div>
       </div>
       {/* LIST */}
-      <Table
-        data={orders}
-        columns={orderDetailColumns}
-        renderRow={renderRow}
-        isLoading={isLoading}
-      />
+      <Table data={orders} columns={orderDetailColumns} renderRow={renderRow} isLoading={isLoading} />
       {/* PAGINATION */}
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page) => {
-          setCurrentPage(page);
-        }}
-      />
+      {/* PAGINATION */}
+      <div className="flex items-center justify-center mt-2">
+        <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
+      </div>
     </div>
   );
 };

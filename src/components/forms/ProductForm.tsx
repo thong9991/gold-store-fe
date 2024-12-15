@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import { productSchema, ProductSchema } from "@/lib/formValidationSchemas";
-import { vietnameseTrans } from "@/lib/vietnameseTrans";
-import { createProduct, updateProduct } from "@/services/products";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import InputField from "../InputField";
-import { FormProps } from "./@types/FormProps";
-import { formatFloatNumber } from "@/utils/formatContent";
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { productSchema, ProductSchema } from '@/lib/formValidationSchemas';
+import { vietnameseTrans } from '@/lib/vietnameseTrans';
+import { createProduct, updateProduct } from '@/services/products';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import InputField from '../InputField';
+import { FormProps } from './@types/FormProps';
+import { formatFloatNumber } from '@/utils/formatContent';
 
 const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
   type,
@@ -49,17 +49,13 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
         gemWeight: parseFloat(data.gemWeight),
       };
 
-      if (type === "create") {
+      if (type === 'create') {
         await createProduct(processedData);
       } else {
         await updateProduct(data.id!, processedData);
       }
 
-      setMessage(
-        type === "create"
-          ? "Thêm thành công"
-          : "Chỉnh sữa thông tin thành công",
-      );
+      setMessage(type === 'create' ? 'Thêm thành công' : 'Chỉnh sửa thông tin thành công');
       setShowMessage(true);
       setMessageType(SnackbarMessageType.Success);
       setIsRefresh(true);
@@ -68,7 +64,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
       if (error instanceof Error) {
         setMessage(`Error: ${error.message}`);
       } else {
-        setMessage("An unknown error occurred while registering the user.");
+        setMessage('An unknown error occurred while registering the user.');
       }
       setShowMessage(true);
     } finally {
@@ -77,12 +73,8 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
   };
 
   return (
-    <form className="flex flex-col gap-8" onSubmit={handleSubmit(onSubmit)}>
-      <h1 className="text-xl font-semibold">
-        {type === "create"
-          ? "Thêm đại lý phân phối"
-          : "Chỉnh sữa đại lý phân phối"}
-      </h1>
+    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <h1 className="text-xl font-semibold">{type === 'create' ? 'Thêm sản phẩm' : 'Chỉnh sửa sản phẩm'}</h1>
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="Tên Sản Phẩm"
@@ -92,16 +84,14 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           error={errors?.productName}
         />
       </div>
-      <span className="text-xs text-gray-400 font-medium">
-        Phân Loại Sản Phẩm
-      </span>
-      <div className="flex justify-between flex-wrap gap-4">
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
+      <span className="text-xs text-gray-400 font-medium">Phân Loại Sản Phẩm</span>
+      <div className="flex justify-between gap-4">
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
           <label className="text-xs text-gray-500">Phân Loại</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("category")}
-            defaultValue={data?.category ?? "other"}
+            {...register('category')}
+            defaultValue={data?.category ?? 'other'}
           >
             <option value="other" key="other">
               Chọn loại trang sức
@@ -116,17 +106,13 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
               Vòng cổ
             </option>
           </select>
-          {errors.category?.message && (
-            <p className="text-xs text-red-400">
-              {errors.category.message.toString()}
-            </p>
-          )}
+          {errors.category?.message && <p className="text-xs text-red-400">{errors.category.message.toString()}</p>}
         </div>
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
           <label className="text-xs text-gray-500">Loại Vàng</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("goldType")}
+            {...register('goldType')}
             defaultValue={data?.goldPrice?.goldType}
           >
             <option value="">Chọn loại vàng</option>
@@ -136,18 +122,14 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
               </option>
             ))}
           </select>
-          {errors.goldType?.message && (
-            <p className="text-xs text-red-400">
-              {errors.goldType.message.toString()}
-            </p>
-          )}
+          {errors.goldType?.message && <p className="text-xs text-red-400">{errors.goldType.message.toString()}</p>}
         </div>
 
-        <div className="flex flex-col gap-2 w-full md:w-1/4">
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
           <label className="text-xs text-gray-500">Đại Lý Phân Phối</label>
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
-            {...register("vendorId")}
+            {...register('vendorId')}
             defaultValue={data?.vendor?.id}
           >
             <option value="">Chọn dại lý</option>
@@ -157,16 +139,10 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
               </option>
             ))}
           </select>
-          {errors.vendorId?.message && (
-            <p className="text-xs text-red-400">
-              {errors.vendorId.message.toString()}
-            </p>
-          )}
+          {errors.vendorId?.message && <p className="text-xs text-red-400">{errors.vendorId.message.toString()}</p>}
         </div>
       </div>
-      <span className="text-xs text-gray-400 font-medium">
-        Thông Tin Sản Phẩm
-      </span>
+      <span className="text-xs text-gray-400 font-medium">Thông Tin Sản Phẩm</span>
       <div className="flex justify-between flex-wrap gap-4">
         <InputField
           label="Tổng Trọng Lượng (chỉ)"
@@ -177,9 +153,9 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           inputProps={{
             onChange: (event) => {
               const progressedValue = formatFloatNumber(event.target.value);
-              setValue("totalWeight", progressedValue);
+              setValue('totalWeight', progressedValue);
             },
-            step: "any",
+            step: 'any',
           }}
           error={errors?.totalWeight}
         />
@@ -192,9 +168,9 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           inputProps={{
             onChange: (event) => {
               const progressedValue = formatFloatNumber(event.target.value);
-              setValue("goldWeight", progressedValue);
+              setValue('goldWeight', progressedValue);
             },
-            step: "any",
+            step: 'any',
           }}
           error={errors?.goldWeight}
         />
@@ -207,9 +183,9 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           inputProps={{
             onChange: (event) => {
               const progressedValue = formatFloatNumber(event.target.value);
-              setValue("gemWeight", progressedValue);
+              setValue('gemWeight', progressedValue);
             },
-            step: "any",
+            step: 'any',
           }}
           error={errors?.gemWeight}
         />
@@ -222,11 +198,8 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           error={errors?.wage}
         />
       </div>
-      <button
-        className="bg-blue-400 text-white p-2 rounded-md"
-        disabled={loading}
-      >
-        {type === "create" ? "Thêm" : "Xong"}
+      <button className="bg-blue-400 text-white p-2 rounded-md" disabled={loading}>
+        {type === 'create' ? 'Thêm' : 'Xong'}
       </button>
     </form>
   );

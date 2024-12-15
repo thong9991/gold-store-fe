@@ -1,18 +1,21 @@
-"use client";
+'use client';
 
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Paginatiion";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import Image from "next/image";
-import { productsColumns } from "./columns/productsColumns";
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import { vietnameseTrans } from "@/lib/vietnameseTrans";
-import { getAllProducts } from "@/services/products";
-import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { getAllVendors } from "@/services/vendors";
-import { getAllGoldPrices } from "@/services/goldPrice";
+import FormModal from '@/components/FormModal';
+import Table from '@/components/Table';
+import { productsColumns } from './columns/productsColumns';
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { vietnameseTrans } from '@/lib/vietnameseTrans';
+import { getAllProducts } from '@/services/products';
+import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import { getAllVendors } from '@/services/vendors';
+import { getAllGoldPrices } from '@/services/goldPrice';
+import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
+import Link from 'next/link';
+import { ProductsIcon } from '@/components/icons/sidebar/products-icon';
+import { Input, Pagination } from '@nextui-org/react';
+import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
+import { InfoIcon } from '@/components/icons/accounts/info-icon';
 
 type Product = {
   id: number;
@@ -44,7 +47,7 @@ const ProductListPage = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [messageType, setMessageType] = useState(SnackbarMessageType.Info);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchVendorsGoldPrices = async () => {
@@ -55,7 +58,7 @@ const ProductListPage = () => {
         const goldPrices = await getAllGoldPrices(-1);
         setGoldPrices(goldPrices);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
       }
@@ -73,7 +76,7 @@ const ProductListPage = () => {
         setProducts(response.body);
         setTotalPages(response.last_page);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
       }
@@ -96,7 +99,7 @@ const ProductListPage = () => {
           setTotalPages(response.last_page);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
         setIsRefresh(false);
@@ -113,35 +116,57 @@ const ProductListPage = () => {
     }
   }, [showMessage, message, messageType]);
 
-  const renderRow = (item: Product) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-blue-200"
-    >
-      <td className="flex items-center gap-4 p-4">
-        <div className="flex flex-col">
-          <h3 className="font-semibold">{item.productName}</h3>
-          <p className="text-xs text-gray-500">{item.id}</p>
-        </div>
-      </td>
-      <td className="hidden md:table-cell">
-        {vietnameseTrans[item.category]}{" "}
-        {vietnameseTrans[`category_${item.goldPrice.goldType}`]}
-      </td>
-      <td className="hidden md:table-cell">{item.vendor.vendorName}</td>
-      <td className="hidden md:table-cell">
-        {parseFloat(item.totalWeight.toString())}
-      </td>
-      <td className="hidden md:table-cell">
-        {parseFloat(item.goldWeight.toString())}
-      </td>
-      <td className="hidden md:table-cell">
-        {parseFloat(item.gemWeight.toString())}
-      </td>
-      <td className="hidden md:table-cell">{item.wage}.000 đ</td>
-      <td>
-        <div className="flex items-center gap-2">
-          <>
+  const renderRow = ({ item, columnKey }: { item: Product; columnKey: string | React.Key }) => {
+    switch (columnKey) {
+      case 'productInfo':
+        return (
+          <div className="flex flex-col gap-2">
+            <h3 className="font-semibold">{item?.productName}</h3>
+            <p className="text-xs text-gray-500">{item?.id}</p>
+          </div>
+        );
+      case 'category/goldType':
+        return (
+          <div>
+            <p className="text-bold text-sm">
+              {vietnameseTrans[item?.category]} {vietnameseTrans[`category_${item?.goldPrice?.goldType}`]}
+            </p>
+          </div>
+        );
+      case 'vendorCode':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.vendor?.vendorName}</p>
+          </div>
+        );
+      case 'totalWeight':
+        return (
+          <div>
+            <p className="text-bold text-sm">{parseFloat(item?.totalWeight.toString())}</p>
+          </div>
+        );
+      case 'goldWeight':
+        return (
+          <div>
+            <p className="text-bold text-sm">{parseFloat(item?.goldWeight.toString())}</p>
+          </div>
+        );
+      case 'gemWeight':
+        return (
+          <div>
+            <p className="text-bold text-sm">{parseFloat(item.gemWeight.toString())}</p>
+          </div>
+        );
+      case 'wage':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.wage}.000 đ</p>
+          </div>
+        );
+
+      case 'action':
+        return (
+          <div className="flex items-center gap-4">
             <FormModal
               table="product"
               type="update"
@@ -164,53 +189,68 @@ const ProductListPage = () => {
               setMessageType={setMessageType}
               setMessage={setMessage}
             />
-          </>
-        </div>
-      </td>
-    </tr>
-  );
-  return (
-    <div className="bg-white rounded-md p-4 flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block font-semibold text-lg">Sản Phẩm</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            <FormModal
-              table="product"
-              type="create"
-              setIsRefresh={setIsRefresh}
-              setShowMessage={setShowMessage}
-              setMessageType={setMessageType}
-              setMessage={setMessage}
-              relatedData={{
-                vendors: vendors,
-                goldPrices: goldPrices,
-              }}
-            />
           </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="my-10 px-4 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
+      {/* TOP */}
+      <ul className="flex">
+        <li className="flex gap-2">
+          <HouseIcon />
+          <Link href={'/admin'}>
+            <span>Trang chủ</span>{' '}
+          </Link>
+          <span> / </span>
+        </li>
+
+        <li className="flex gap-2">
+          <ProductsIcon />
+          <span>Sản phẩm</span>
+          <span> / </span>
+        </li>
+        <li className="flex gap-2">
+          <span>&nbsp;Danh sách</span>
+        </li>
+      </ul>
+      <h3 className="text-xl font-semibold">Tất cả sản phẩm</h3>
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+          <Input
+            classNames={{
+              input: 'w-full',
+              mainWrapper: 'w-full',
+            }}
+            placeholder="Tìm kiếm"
+          />
+          <SettingsIcon />
+          <InfoIcon />
+        </div>
+        <div className="flex flex-row gap-3.5 flex-wrap">
+          <FormModal
+            table="product"
+            type="create"
+            setIsRefresh={setIsRefresh}
+            setShowMessage={setShowMessage}
+            setMessageType={setMessageType}
+            setMessage={setMessage}
+            relatedData={{
+              vendors: vendors,
+              goldPrices: goldPrices,
+            }}
+          />
         </div>
       </div>
       {/* LIST */}
-      <Table
-        data={products}
-        columns={productsColumns}
-        renderRow={renderRow}
-        isLoading={isLoading}
-      />
+      <Table data={products} columns={productsColumns} renderRow={renderRow} isLoading={isLoading} />
       {/* PAGINATION */}
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
+      <div className="flex items-center justify-center mt-2">
+        <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
+      </div>
     </div>
   );
 };

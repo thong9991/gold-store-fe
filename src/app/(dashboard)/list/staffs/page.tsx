@@ -1,15 +1,18 @@
-"use client";
+'use client';
 
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Paginatiion";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import { getAllStaffs } from "@/services/staffs";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { staffsColumns } from "./columns/staffsColumns";
+import FormModal from '@/components/FormModal';
+import Table from '@/components/Table';
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { getAllStaffs } from '@/services/staffs';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { staffsColumns } from './columns/staffsColumns';
+import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
+import Link from 'next/link';
+import { Input, Pagination } from '@nextui-org/react';
+import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
+import { InfoIcon } from '@/components/icons/accounts/info-icon';
+import { AccountsIcon } from '@/components/icons/sidebar/accounts-icon';
 
 type Staff = {
   id: number;
@@ -29,7 +32,7 @@ const StaffListPage = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [messageType, setMessageType] = useState(SnackbarMessageType.Info);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchStaffs = async () => {
@@ -40,7 +43,7 @@ const StaffListPage = () => {
         setStaffs(response.body);
         setTotalPages(response.last_page);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
       }
@@ -63,7 +66,7 @@ const StaffListPage = () => {
           setTotalPages(response.last_page);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
         setIsRefresh(false);
@@ -80,19 +83,32 @@ const StaffListPage = () => {
     }
   }, [showMessage, message, messageType]);
 
-  const renderRow = (item: Staff) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-blue-200"
-    >
-      <td className="flex items-center gap-4 p-4">
-        {item.firstName} {item.lastName}
-      </td>
-      <td className="hidden md:table-cell">{item.phone}</td>
-      <td className="hidden md:table-cell">{item.address}</td>
-      <td>
-        <div className="flex items-center gap-2">
-          <>
+  const renderRow = ({ item, columnKey }: { item: Staff; columnKey: string | React.Key }) => {
+    switch (columnKey) {
+      case 'name':
+        return (
+          <div>
+            <p className="text-bold text-sm">
+              {item.firstName} {item.lastName}
+            </p>
+          </div>
+        );
+      case 'phone':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item.phone}</p>
+          </div>
+        );
+      case 'address':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.address}</p>
+          </div>
+        );
+
+      case 'action':
+        return (
+          <div className="flex items-center gap-4">
             <FormModal
               table="staff"
               type="update"
@@ -111,49 +127,64 @@ const StaffListPage = () => {
               setMessageType={setMessageType}
               setMessage={setMessage}
             />
-          </>
-        </div>
-      </td>
-    </tr>
-  );
-  return (
-    <div className="bg-white rounded-md p-4 flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block font-semibold text-lg">Nhân Viên</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            <FormModal
-              table="staff"
-              type="create"
-              setIsRefresh={setIsRefresh}
-              setShowMessage={setShowMessage}
-              setMessageType={setMessageType}
-              setMessage={setMessage}
-            />
           </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="my-10 px-4 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
+      {/* TOP */}
+      <ul className="flex">
+        <li className="flex gap-2">
+          <HouseIcon />
+          <Link href={'/admin'}>
+            <span>Trang chủ</span>{' '}
+          </Link>
+          <span> / </span>
+        </li>
+
+        <li className="flex gap-2">
+          <AccountsIcon />
+          <span>Nhân Viên</span>
+          <span> / </span>
+        </li>
+        <li className="flex gap-2">
+          <span>&nbsp;Danh sách</span>
+        </li>
+      </ul>
+      <h3 className="text-xl font-semibold">Tất cả nhân viên</h3>
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+          <Input
+            classNames={{
+              input: 'w-full',
+              mainWrapper: 'w-full',
+            }}
+            placeholder="Tìm kiếm"
+          />
+          <SettingsIcon />
+          <InfoIcon />
+        </div>
+        <div className="flex flex-row gap-3.5 flex-wrap">
+          <FormModal
+            table="staff"
+            type="create"
+            setIsRefresh={setIsRefresh}
+            setShowMessage={setShowMessage}
+            setMessageType={setMessageType}
+            setMessage={setMessage}
+          />
         </div>
       </div>
       {/* LIST */}
-      <Table
-        data={staffs}
-        columns={staffsColumns}
-        renderRow={renderRow}
-        isLoading={isLoading}
-      />
+      <Table data={staffs} columns={staffsColumns} renderRow={renderRow} isLoading={isLoading} />
       {/* PAGINATION */}
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
+      <div className="flex items-center justify-center mt-2">
+        <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
+      </div>
     </div>
   );
 };

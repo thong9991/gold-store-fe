@@ -1,23 +1,37 @@
-"use client";
+'use client';
 
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Paginatiion";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import { vietnameseTrans } from "@/lib/vietnameseTrans";
-import { getAllGoldPrices } from "@/services/goldPrice";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { goldPricesColumns } from "./columns/goldPricesColumns";
+import FormModal from '@/components/FormModal';
+// import Table from '@/components/Table';
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { vietnameseTrans } from '@/lib/vietnameseTrans';
+import { getAllGoldPrices } from '@/services/goldPrice';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { goldPricesColumns } from './columns/goldPricesColumns';
+import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
+import Link from 'next/link';
+import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
+import {
+  Table,
+  Input,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  getKeyValue,
+  Pagination,
+} from '@nextui-org/react';
+import { InfoIcon } from '@/components/icons/accounts/info-icon';
+import { PaymentsIcon } from '@/components/icons/sidebar/payments-icon';
 
 type GoldPrice = {
   goldType: string;
   askPrice: number;
   bidPrice: number;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 const GoldPriceListPage = () => {
@@ -28,7 +42,7 @@ const GoldPriceListPage = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [messageType, setMessageType] = useState(SnackbarMessageType.Info);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchGoldPrices = async () => {
@@ -39,7 +53,7 @@ const GoldPriceListPage = () => {
         setGoldPrices(response.body);
         setTotalPages(response.last_page);
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +76,7 @@ const GoldPriceListPage = () => {
           setTotalPages(response.last_page);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
         setIsRefresh(false);
@@ -80,19 +94,10 @@ const GoldPriceListPage = () => {
   }, [showMessage, message, messageType]);
 
   const renderRow = (item: GoldPrice) => (
-    <tr
-      key={item.goldType}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-blue-200"
-    >
-      <td className="flex items-center gap-4 p-4">
-        {vietnameseTrans[item.goldType]}
-      </td>
-      <td className="hidden md:table-cell">
-        {item.askPrice.toLocaleString()},000
-      </td>
-      <td className="hidden md:table-cell">
-        {item.bidPrice.toLocaleString()},000
-      </td>
+    <tr key={item.goldType} className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-blue-200">
+      <td className="flex items-center gap-4 p-4">{vietnameseTrans[item.goldType]}</td>
+      <td className="hidden md:table-cell">{item.askPrice.toLocaleString()},000</td>
+      <td className="hidden md:table-cell">{item.bidPrice.toLocaleString()},000</td>
       <td>
         <div className="flex items-center gap-2">
           <>
@@ -110,38 +115,83 @@ const GoldPriceListPage = () => {
       </td>
     </tr>
   );
+
   return (
-    <div className="bg-white rounded-md p-4 flex-1 m-4 mt-0">
+    <div className="my-10 px-4 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
       {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block font-semibold text-lg">Giá Vàng</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-buttonColor">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-buttonColor">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-          </div>
+      <ul className="flex">
+        <li className="flex gap-2">
+          <HouseIcon />
+          <Link href={'/admin'}>
+            <span>Trang chủ</span>
+          </Link>
+          <span> / </span>
+        </li>
+
+        <li className="flex gap-2">
+          <PaymentsIcon />
+          <span>Giá vàng</span>
+          <span> / </span>
+        </li>
+        <li className="flex gap-2">
+          <span>&nbsp;Danh sách</span>
+        </li>
+      </ul>
+      <h3 className="text-xl font-semibold">Tất cả giá vàng</h3>
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+          <Input
+            classNames={{
+              input: 'w-full',
+              mainWrapper: 'w-full',
+            }}
+            placeholder="Tìm kiếm"
+          />
+          <SettingsIcon />
+          <InfoIcon />
         </div>
       </div>
       {/* LIST */}
-      <Table
-        data={goldPrices}
-        columns={goldPricesColumns}
-        renderRow={renderRow}
-        isLoading={isLoading}
-      />
+      <Table removeWrapper isStriped aria-label="Table">
+        <TableHeader columns={goldPricesColumns}>
+          {(column) => (
+            <TableColumn
+              key={column?.accessor}
+              align={column?.accessor === 'actions' ? 'center' : 'start'}
+              className="uppercase"
+            >
+              {column.header}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody>
+          {goldPrices.map((row) => (
+            <TableRow key={row.goldType}>
+              {(columnKey) => (
+                <TableCell>
+                  {columnKey === 'action' ? (
+                    <FormModal
+                      table="goldPrice"
+                      type="update"
+                      data={row}
+                      setIsRefresh={setIsRefresh}
+                      setShowMessage={setShowMessage}
+                      setMessageType={setMessageType}
+                      setMessage={setMessage}
+                    />
+                  ) : (
+                    getKeyValue(row, columnKey)
+                  )}
+                </TableCell>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
       {/* PAGINATION */}
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page) => {
-          setCurrentPage(page);
-        }}
-      />
+      <div className="flex items-center justify-center mt-2">
+        <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
+      </div>
     </div>
   );
 };

@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
-import FormModal from "@/components/FormModal";
-import Pagination from "@/components/Paginatiion";
-import Table from "@/components/Table";
-import TableSearch from "@/components/TableSearch";
-import { SnackbarMessageType } from "@/enums/snackbarMessages";
-import { vietnameseTrans } from "@/lib/vietnameseTrans";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { cashDrawersColumns } from "./columns/cashDrawersColumns";
-import Link from "next/link";
-import { getAllCashFlows } from "@/services/cashFlows";
+import FormModal from '@/components/FormModal';
+import Table from '@/components/Table';
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import { cashDrawersColumns } from './columns/cashDrawersColumns';
+import Link from 'next/link';
+import { getAllCashFlows } from '@/services/cashFlows';
+import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
+import { Input, Pagination } from '@nextui-org/react';
+import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
+import { InfoIcon } from '@/components/icons/accounts/info-icon';
+import { CashflowIcon } from '@/components/icons/sidebar/cashflow-icon';
 
 type CashFlows = {
   id: number;
@@ -27,7 +28,7 @@ const CashFlowsListPage = () => {
   const [isRefresh, setIsRefresh] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
   const [messageType, setMessageType] = useState(SnackbarMessageType.Info);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchCashDrawers = async () => {
@@ -37,7 +38,7 @@ const CashFlowsListPage = () => {
         setCashFlow(response.body);
         setTotalPages(response.last_page);
       } catch (error) {
-        console.error("Error fetch cash flow:", error);
+        console.error('Error fetch cash flow:', error);
       } finally {
         setIsLoading(false);
       }
@@ -60,7 +61,7 @@ const CashFlowsListPage = () => {
           setTotalPages(response.last_page);
         }
       } catch (error) {
-        console.error("Error fetching users:", error);
+        console.error('Error fetching users:', error);
       } finally {
         setIsLoading(false);
         setIsRefresh(false);
@@ -77,72 +78,81 @@ const CashFlowsListPage = () => {
     }
   }, [showMessage, message, messageType]);
 
-  const renderRow = (item: CashFlows) => (
-    <tr
-      key={item.id}
-      className="border-b border-gray-200 even:bg-slate-50 text-sm hover:bg-blue-200"
-    >
-      <td className="flex items-center gap-4 p-4">
-        {item?.id}
-      </td>
-      <td className="hidden md:table-cell">
-        {item?.amount}.000đ
-      </td>
-      <td>
-        <div className="flex items-center gap-2">
-          <FormModal
-            table="cashFlow"
-            type="delete"
-            id={item.id}
-            setIsRefresh={setIsRefresh}
-            setShowMessage={setShowMessage}
-            setMessageType={setMessageType}
-            setMessage={setMessage}
-          />
-        </div>
-      </td>
-    </tr>
-  );
-  return (
-    <div className="bg-white rounded-md p-4 flex-1 m-4 mt-0">
-      {/* TOP */}
-      <div className="flex items-center justify-between">
-        <h1 className="hidden md:block font-semibold text-lg">Danh sách dòng tiền</h1>
-        <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-          <TableSearch />
-          <div className="flex items-center gap-4 self-end">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/filter.png" alt="" width={14} height={14} />
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-300">
-              <Image src="/sort.png" alt="" width={14} height={14} />
-            </button>
-            {/* <FormModal
+  const renderRow = ({ item, columnKey }: { item: CashFlows; columnKey: string | React.Key }) => {
+    switch (columnKey) {
+      case 'id':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.id}</p>
+          </div>
+        );
+      case 'amount':
+        return (
+          <div>
+            <p className="text-bold text-sm">{item?.amount}</p>
+          </div>
+        );
+
+      case 'action':
+        return (
+          <div className="flex items-center gap-4">
+            <FormModal
               table="cashFlow"
-              type="create"
+              type="delete"
+              id={item.id}
               setIsRefresh={setIsRefresh}
               setShowMessage={setShowMessage}
               setMessageType={setMessageType}
               setMessage={setMessage}
-            /> */}
+            />
           </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="my-10 px-4 lg:px-6 max-w-[95rem] mx-auto w-full flex flex-col gap-4">
+      {/* TOP */}
+      <ul className="flex">
+        <li className="flex gap-2">
+          <HouseIcon />
+          <Link href={'/admin'}>
+            <span>Trang chủ</span>{' '}
+          </Link>
+          <span> / </span>
+        </li>
+
+        <li className="flex gap-2">
+          <CashflowIcon />
+          <span>Dòng tiền</span>
+          <span> / </span>
+        </li>
+        <li className="flex gap-2">
+          <span>&nbsp;Danh sách</span>
+        </li>
+      </ul>
+      <h3 className="text-xl font-semibold">Tất cả dòng tiền</h3>
+      <div className="flex justify-between flex-wrap gap-4 items-center">
+        <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
+          <Input
+            classNames={{
+              input: 'w-full',
+              mainWrapper: 'w-full',
+            }}
+            placeholder="Tìm kiếm"
+          />
+          <SettingsIcon />
+          <InfoIcon />
         </div>
       </div>
       {/* LIST */}
-      <Table
-        data={cashFlow}
-        columns={cashDrawersColumns}
-        renderRow={renderRow}
-        isLoading={isLoading}
-      />
+      <Table data={cashFlow} columns={cashDrawersColumns} renderRow={renderRow} isLoading={isLoading} />
       {/* PAGINATION */}
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={(page) => {
-          setCurrentPage(page);
-        }}
-      />
+      <div className="flex items-center justify-center mt-2">
+        <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
+      </div>
     </div>
   );
 };

@@ -4,7 +4,7 @@ export const cashDrawersColumns: TableColumn[] = [
     accessor: "id",
   },
   {
-    header: "Số tiền",
+    header: "Tài sản",
     accessor: "amount",
     className: "hidden md:table-cell",
   },
