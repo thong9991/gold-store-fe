@@ -1,18 +1,18 @@
 'use client';
 
-import FormModal from '@/components/FormModal';
-import Table from '@/components/Table';
-import { SnackbarMessageType } from '@/enums/snackbarMessages';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { orderDetailColumns } from './columns/orderDetailColumns';
-import { getAllOrders } from '@/services/orderDetails';
-import { Input, Pagination } from '@nextui-org/react';
-import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
 import Link from 'next/link';
-import { CartIcon } from '@/components/icons/sidebar/cart-icon';
+import { Input, Pagination } from '@nextui-org/react';
+
+import { SnackbarMessageType } from '@/enums/snackbarMessages';
+import { getAllOrders } from '@/services/orderDetails';
+import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
 import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
 import { InfoIcon } from '@/components/icons/accounts/info-icon';
+import { ReportsIcon } from '@/components/icons/sidebar/reports-icon';
+import Table from '@/components/Table';
+import { orderDetailColumns } from './columns/orderDetailColumns';
 
 type OrderDetail = {
   id: number;
@@ -25,7 +25,7 @@ type OrderDetail = {
   updatedAt: string;
 };
 
-const OrderDetailListPage = () => {
+const ReportPage = () => {
   const [orders, setOrders] = useState<OrderDetail[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -115,20 +115,6 @@ const OrderDetailListPage = () => {
             <p className="text-bold text-sm">{item?.description}</p>
           </div>
         );
-      case 'action':
-        return (
-          <div className="flex items-center gap-4">
-            <FormModal
-              table="order"
-              type="delete"
-              id={item.id}
-              setIsRefresh={setIsRefresh}
-              setShowMessage={setShowMessage}
-              setMessageType={setMessageType}
-              setMessage={setMessage}
-            />
-          </div>
-        );
       default:
         return null;
     }
@@ -147,15 +133,15 @@ const OrderDetailListPage = () => {
         </li>
 
         <li className="flex gap-2">
-          <CartIcon />
-          <span>Chi tiết đặt hàng</span>
+          <ReportsIcon />
+          <span>Báo cáo</span>
           <span> / </span>
         </li>
         <li className="flex gap-2">
           <span>&nbsp;Danh sách</span>
         </li>
       </ul>
-      <h3 className="text-xl font-semibold">Tất cả đơn đặt hàng</h3>
+      <h3 className="text-xl font-semibold">Tất cả đơn đặt hàng trong hôm nay</h3>
       <div className="flex justify-between flex-wrap gap-4 items-center">
         <div className="flex items-center gap-3 flex-wrap md:flex-nowrap">
           <Input
@@ -172,10 +158,10 @@ const OrderDetailListPage = () => {
       {/* LIST */}
       <Table data={orders} columns={orderDetailColumns} renderRow={renderRow} isLoading={isLoading} />
       {/* PAGINATION */}
-      <div className="flex items-center justify-center mt-2">
+      {/* <div className="flex items-center justify-center mt-2">
         <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
-      </div>
+      </div> */}
     </div>
   );
 };
-export default OrderDetailListPage;
+export default ReportPage;

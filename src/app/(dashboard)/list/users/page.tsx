@@ -3,9 +3,7 @@
 import { Input, Pagination, Tooltip } from '@nextui-org/react';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-
 import FormModal from '@/components/FormModal';
-// import Pagination from '@/components/Paginatiion';
 import TableWrapper from '@/components/Table';
 import { SnackbarMessageType } from '@/enums/snackbarMessages';
 import { vietnameseTrans } from '@/lib/vietnameseTrans';

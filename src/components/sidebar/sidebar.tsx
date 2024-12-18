@@ -72,7 +72,7 @@ const menuItems = [
       {
         icon: <ReportsIcon />,
         label: 'Báo cáo',
-        href: '/report',
+        href: '/list/report',
       },
     ],
   },

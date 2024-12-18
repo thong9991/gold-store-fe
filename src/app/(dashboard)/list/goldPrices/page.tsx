@@ -1,11 +1,9 @@
 'use client';
 
 import FormModal from '@/components/FormModal';
-// import Table from '@/components/Table';
 import { SnackbarMessageType } from '@/enums/snackbarMessages';
 import { vietnameseTrans } from '@/lib/vietnameseTrans';
 import { getAllGoldPrices } from '@/services/goldPrice';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { goldPricesColumns } from './columns/goldPricesColumns';

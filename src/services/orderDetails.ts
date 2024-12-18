@@ -1,4 +1,4 @@
-import { api } from "@/services/api";
+import { api } from '@/services/api';
 
 export interface UpdateOrderData {
   total?: number;
@@ -7,20 +7,17 @@ export interface UpdateOrderData {
   description?: string;
 }
 
-async function updateOrder(
-  id: number,
-  updateData: UpdateOrderData,
-): Promise<any> {
+async function updateOrder(id: number, updateData: UpdateOrderData): Promise<any> {
   try {
     const response = await api(`/orders/${id}`, {
-      method: "PATCH",
+      method: 'PATCH',
       body: JSON.stringify(updateData),
-      cache: "no-store",
+      cache: 'no-store',
     });
 
     return response.data;
   } catch (error) {
-    console.error("Error updating order:", error);
+    console.error('Error updating order:', error);
     throw error;
   }
 }
@@ -28,13 +25,13 @@ async function updateOrder(
 async function deleteOrder(id: string): Promise<any> {
   try {
     const response = await api(`/orders/${id}`, {
-      method: "DELETE",
-      cache: "no-store",
+      method: 'DELETE',
+      cache: 'no-store',
     });
 
     return response.data;
   } catch (error) {
-    console.error("Error removing order:", error);
+    console.error('Error removing order:', error);
     throw error;
   }
 }
@@ -42,14 +39,27 @@ async function deleteOrder(id: string): Promise<any> {
 async function getAllOrders(page: number = 1): Promise<any> {
   try {
     const response = await api(`/orders/?page=${page}`, {
-      method: "GET",
-      cache: "no-store",
+      method: 'GET',
+      cache: 'no-store',
     });
     return response;
   } catch (error) {
-    console.error("Error get all orders:", error);
+    console.error('Error get all orders:', error);
     throw error;
   }
 }
 
-export { updateOrder, deleteOrder, getAllOrders };
+async function getOrderStatistic(): Promise<any> {
+  try {
+    const response = await api(`/orders/statistics`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error get all orders:', error);
+    throw error;
+  }
+}
+
+export { updateOrder, deleteOrder, getAllOrders, getOrderStatistic };

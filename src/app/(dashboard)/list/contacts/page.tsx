@@ -3,7 +3,6 @@
 import FormModal from '@/components/FormModal';
 import Table from '@/components/Table';
 import { SnackbarMessageType } from '@/enums/snackbarMessages';
-import { vietnameseTrans } from '@/lib/vietnameseTrans';
 import { getAllContacts } from '@/services/contacts';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
