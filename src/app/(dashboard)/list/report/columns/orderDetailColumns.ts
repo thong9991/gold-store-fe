@@ -4,6 +4,11 @@ export const orderDetailColumns: TableColumn[] = [
     accessor: 'id',
   },
   {
+    header: 'Discount',
+    accessor: 'discount',
+    className: 'hidden md:table-cell',
+  },
+  {
     header: 'Tổng tiền',
     accessor: 'total',
     className: 'hidden md:table-cell',
@@ -13,9 +18,10 @@ export const orderDetailColumns: TableColumn[] = [
     accessor: 'goldToCash',
     className: 'hidden md:table-cell',
   },
+
   {
-    header: 'Discount',
-    accessor: 'discount',
+    header: 'Order exchanges',
+    accessor: 'orderExchanges',
     className: 'hidden md:table-cell',
   },
   {

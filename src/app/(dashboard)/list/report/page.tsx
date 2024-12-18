@@ -1,18 +1,29 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import Link from 'next/link';
-import { Input, Pagination } from '@nextui-org/react';
+import { Input } from '@nextui-org/react';
 
-import { SnackbarMessageType } from '@/enums/snackbarMessages';
-import { getAllOrders } from '@/services/orderDetails';
+import { getOrderReport } from '@/services/orderDetails';
 import { HouseIcon } from '@/components/icons/breadcrumb/house-icon';
 import { SettingsIcon } from '@/components/icons/sidebar/settings-icon';
 import { InfoIcon } from '@/components/icons/accounts/info-icon';
 import { ReportsIcon } from '@/components/icons/sidebar/reports-icon';
 import Table from '@/components/Table';
 import { orderDetailColumns } from './columns/orderDetailColumns';
+import { vietnameseTrans } from '@/lib/vietnameseTrans';
+
+type OrderExchange = {
+  id: number;
+  amount: string;
+  goldPrice: {
+    goldType: string;
+    askPrice: number;
+    bidPrice: number;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
 
 type OrderDetail = {
   id: number;
@@ -21,27 +32,19 @@ type OrderDetail = {
   discount: number;
   description: string;
   isChecked: boolean;
-  createdAt: string;
-  updatedAt: string;
+  __orderExchanges__: OrderExchange[];
 };
 
 const ReportPage = () => {
   const [orders, setOrders] = useState<OrderDetail[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isRefresh, setIsRefresh] = useState(false);
-  const [showMessage, setShowMessage] = useState(false);
-  const [messageType, setMessageType] = useState(SnackbarMessageType.Info);
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setIsLoading(true);
-        const response = await getAllOrders(currentPage);
+        const response = await getOrderReport();
         setOrders(response.body);
-        setTotalPages(response.last_page);
       } catch (error) {
         console.error('Error fetch assets:', error);
       } finally {
@@ -50,38 +53,26 @@ const ReportPage = () => {
     };
 
     fetchOrders();
-  }, [currentPage]);
+  }, []);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        if (isRefresh) {
-          setIsLoading(true);
-          const response = await getAllOrders(currentPage);
-          if (response.body.length === 0 && currentPage > 1) {
-            setCurrentPage(currentPage - 1);
-          } else {
-            setOrders(response.body);
-          }
-          setTotalPages(response.last_page);
-        }
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      } finally {
-        setIsLoading(false);
-        setIsRefresh(false);
+  const convertDateOrderExchange = (orders: OrderExchange[]): Record<string, number> => {
+    if (!orders.length) return {};
+
+    return orders.reduce((accumulator, currentValue) => {
+      const goldType = currentValue?.goldPrice?.goldType;
+
+      if (!goldType) {
+        return accumulator;
       }
-    };
 
-    fetchOrders();
-  }, [currentPage, isRefresh]);
+      if (!accumulator[goldType]) {
+        accumulator[goldType] = 0;
+      }
 
-  useEffect(() => {
-    if (showMessage === true) {
-      toast(message, { type: messageType });
-      setShowMessage(false);
-    }
-  }, [showMessage, message, messageType]);
+      accumulator[goldType] += +parseFloat(currentValue.amount.replace(/\./g, ''));
+      return accumulator;
+    }, {} as Record<string, number>);
+  };
 
   const renderRow = ({ item, columnKey }: { item: OrderDetail; columnKey: string | React.Key }) => {
     switch (columnKey) {
@@ -107,6 +98,18 @@ const ReportPage = () => {
         return (
           <div>
             <p className="text-bold text-sm">{item?.discount},000</p>
+          </div>
+        );
+      case 'orderExchanges':
+        const dataOrderExchange = convertDateOrderExchange(item.__orderExchanges__);
+        return (
+          <div>
+            {Object.keys(dataOrderExchange).length &&
+              Object.entries(dataOrderExchange).map(([key, value]) => (
+                <p key={key} className="text-bold text-sm">
+                  <span style={{ fontWeight: 700, fontSize: 16 }}>{vietnameseTrans[key]}:</span> {value}
+                </p>
+              ))}
           </div>
         );
       case 'description':
@@ -158,9 +161,6 @@ const ReportPage = () => {
       {/* LIST */}
       <Table data={orders} columns={orderDetailColumns} renderRow={renderRow} isLoading={isLoading} />
       {/* PAGINATION */}
-      {/* <div className="flex items-center justify-center mt-2">
-        <Pagination showControls total={totalPages} initialPage={currentPage} onChange={setCurrentPage} />
-      </div> */}
     </div>
   );
 };

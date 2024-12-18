@@ -62,4 +62,17 @@ async function getOrderStatistic(): Promise<any> {
   }
 }
 
-export { updateOrder, deleteOrder, getAllOrders, getOrderStatistic };
+async function getOrderReport(): Promise<any> {
+  try {
+    const response = await api(`/orders/report`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    return response;
+  } catch (error) {
+    console.error('Error get all orders:', error);
+    throw error;
+  }
+}
+
+export { updateOrder, deleteOrder, getAllOrders, getOrderStatistic, getOrderReport };
