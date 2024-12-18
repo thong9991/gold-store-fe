@@ -2,11 +2,13 @@ import { Avatar, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Navbar, 
 import React, { useCallback } from 'react';
 import { DarkModeSwitch } from './darkmodeswitch';
 import { useRouter } from 'next/navigation';
-import { destroyCookie } from 'nookies';
 
 export const UserDropdown = () => {
   const router = useRouter();
-  const userInfo = JSON.parse(localStorage.getItem('userInfo') as any);
+  let userInfo;
+  if (typeof window !== 'undefined') {
+    userInfo = JSON.parse(localStorage.getItem('userInfo') as any);
+  }
 
   const handleLogout = useCallback(async () => {
     localStorage.removeItem('userInfo');
