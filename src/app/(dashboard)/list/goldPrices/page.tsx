@@ -177,6 +177,8 @@ const GoldPriceListPage = () => {
                       setMessageType={setMessageType}
                       setMessage={setMessage}
                     />
+                  ) : columnKey === 'goldType' ? (
+                    vietnameseTrans[getKeyValue(row, columnKey)]
                   ) : (
                     getKeyValue(row, columnKey)
                   )}
