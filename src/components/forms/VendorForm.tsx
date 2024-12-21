@@ -66,6 +66,7 @@ const VendorForm: React.FC<FormProps> = ({
       setShowMessage(true);
       setMessageType(SnackbarMessageType.Success);
       setIsRefresh(true);
+      setOpen(false);
     } catch (error) {
       setMessageType(SnackbarMessageType.Error);
       if (error instanceof Error) {

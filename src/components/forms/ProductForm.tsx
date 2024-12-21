@@ -5,11 +5,12 @@ import { productSchema, ProductSchema } from '@/lib/formValidationSchemas';
 import { vietnameseTrans } from '@/lib/vietnameseTrans';
 import { createProduct, updateProduct } from '@/services/products';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import InputField from '../InputField';
 import { FormProps } from './@types/FormProps';
 import { formatFloatNumber } from '@/utils/formatContent';
+import { getAllGoldPrices } from '@/services/goldPrice';
 
 const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
   type,
@@ -29,7 +30,27 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
   } = useForm<ProductSchema>({
     resolver: zodResolver(productSchema),
   });
-  const { vendors, goldPrices } = relatedData;
+  const [goldPrices, setGoldPrices] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const newData = data;
+
+  useEffect(() => {
+    const fetchVendorsGoldPrices = async () => {
+      try {
+        setIsLoading(true);
+        const goldPrices = await getAllGoldPrices(-1);
+        setGoldPrices(goldPrices);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVendorsGoldPrices();
+  }, []);
+
+  const { vendors } = relatedData;
   const [loading, setLoading] = useState(false);
 
   const onSubmit: SubmitHandler<ProductSchema> = async (data) => {
@@ -52,13 +73,14 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
       if (type === 'create') {
         await createProduct(processedData);
       } else {
-        await updateProduct(data.id!, processedData);
+        await updateProduct(newData.id!, processedData);
       }
 
       setMessage(type === 'create' ? 'Thêm thành công' : 'Chỉnh sửa thông tin thành công');
       setShowMessage(true);
       setMessageType(SnackbarMessageType.Success);
       setIsRefresh(true);
+      setOpen(false);
     } catch (error) {
       setMessageType(SnackbarMessageType.Error);
       if (error instanceof Error) {
@@ -72,6 +94,8 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
     }
   };
 
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-xl font-semibold">{type === 'create' ? 'Thêm sản phẩm' : 'Chỉnh sửa sản phẩm'}</h1>
@@ -79,7 +103,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
         <InputField
           label="Tên Sản Phẩm"
           name="productName"
-          defaultValue={data?.productName}
+          defaultValue={newData?.productName}
           register={register}
           error={errors?.productName}
         />
@@ -91,7 +115,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register('category')}
-            defaultValue={data?.category ?? 'other'}
+            defaultValue={newData?.category ?? 'other'}
           >
             <option value="other" key="other">
               Chọn loại trang sức
@@ -113,11 +137,11 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register('goldType')}
-            defaultValue={data?.goldPrice?.goldType}
+            defaultValue={newData?.goldPrice?.goldType}
           >
             <option value="">Chọn loại vàng</option>
             {goldPrices.map((goldPrice: { goldType: string }) => (
-              <option value={goldPrice.goldType} key={goldPrice.goldType}>
+              <option value={goldPrice?.goldType} key={goldPrice?.goldType}>
                 {vietnameseTrans[goldPrice.goldType]}
               </option>
             ))}
@@ -130,7 +154,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
           <select
             className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full"
             {...register('vendorId')}
-            defaultValue={data?.vendor?.id}
+            defaultValue={newData?.vendor?.id}
           >
             <option value="">Chọn dại lý</option>
             {vendors.map((vendor: { id: string; vendorName: string }) => (
@@ -147,7 +171,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
         <InputField
           label="Tổng Trọng Lượng (chỉ)"
           name="totalWeight"
-          defaultValue={data?.totalWeight}
+          defaultValue={newData?.totalWeight}
           register={register}
           type="number"
           inputProps={{
@@ -162,7 +186,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
         <InputField
           label="Trọng Lượng Vàng (chỉ)"
           name="goldWeight"
-          defaultValue={data?.goldWeight}
+          defaultValue={newData?.goldWeight}
           register={register}
           type="number"
           inputProps={{
@@ -177,7 +201,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
         <InputField
           label="Trọng Lượng Đá (chỉ)"
           name="gemWeight"
-          defaultValue={data?.gemWeight}
+          defaultValue={newData?.gemWeight}
           register={register}
           type="number"
           inputProps={{
@@ -192,7 +216,7 @@ const ProductForm: React.FC<FormProps & { relatedData?: any }> = ({
         <InputField
           label="Tiền Công"
           name="wage"
-          defaultValue={data?.wage}
+          defaultValue={newData?.wage}
           register={register}
           type="number"
           error={errors?.wage}
